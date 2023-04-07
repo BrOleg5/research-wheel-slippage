@@ -1,0 +1,178 @@
+\section{Исследование влияния распределения массы робота по колёсам}
+
+{\bfseries Гипотеза:} отличие полученных характеристик для второго двигателя от первого и третьего вызвано неравномерным распределением массы робота. 
+Конструкции робота предполагает расположение двух аккумуляторных батарей в задней части робота между первым и вторым и вторым и третьим колёсами, что создаёт дисбаланс распределения массы по колёсам.
+Получается, что на второе колесо приходится больше массы, чем на первое и третье.
+
+Для того, чтобы сделать распределение массы по колёсам более равномерным, добавим такую же аккумуляторную батарею в переднюю часть робота между первым и третьим колесом.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/polar_current/half_second_averaging/gray motor 1.pdf}
+        \caption{двигатель 1}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/polar_current/half_second_averaging/gray motor 3.pdf}
+        \caption{двигатель 3}
+    \end{subfigure} \\
+    \vspace{4pt}
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/polar_current/half_second_averaging/gray motor 2.pdf}
+        \caption{двигатель 2}
+    \end{subfigure}
+    \caption{Зависимость тока двигателя от направления движения робота на серой поверхности для неравномерного и равномерного распределение массы}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/polar_current/full_averaging/gray motor 1.pdf}
+        \caption{двигатель 1}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/polar_current/full_averaging/gray motor 3.pdf}
+        \caption{двигатель 3}
+    \end{subfigure} \\
+    \vspace{4pt}
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/polar_current/full_averaging/gray motor 2.pdf}
+        \caption{двигатель 2}
+    \end{subfigure}
+    \caption{Зависимость среднего значения тока от направления движения робота}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/robot_delta_speed_vs_axis_current/gray/x_axis.pdf}
+        \caption{вдоль оси X}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/robot_delta_speed_vs_axis_current/gray/y_axis.pdf}
+        \caption{вдоль оси Y}
+    \end{subfigure} \\
+    \vspace{4pt}
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/robot_delta_speed_vs_axis_current/gray/rotation.pdf}
+        \caption{вращательное движение}
+    \end{subfigure}
+    \caption{Сравнение по осям локальной системы координат робота}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/wheel_slippage_vs_motor_current/gray motor 1.pdf}
+        \caption{двигатель 1}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/wheel_slippage_vs_motor_current/gray motor 3.pdf}
+        \caption{двигатель 3}
+    \end{subfigure} \\
+    \vspace{4pt}
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{wheel_load_distribution/wheel_slippage_vs_motor_current/gray motor 2.pdf}
+        \caption{двигатель 2}
+    \end{subfigure}
+    \caption{Сравнение по двигателям}
+\end{figure}
+
+\subsection{Измерение силы нормальной реакции опоры на колёсах Robotino 2}
+
+Измерения проводились с помощью кухонных весов с диапазоном измерения \qtyrange{2}{5000}{г}.
+Точность измерения весов \qty{1}{г}.
+
+Для измерения силы нормальной реакции опоры или силы давления колеса на опору под одно из колёс робота подкладывались весы, под оставшиеся колёса -- опоры примерно равной с весами высотой.
+Это необходимо, чтобы избежать перекоса робота и тем самым повысить точность полученных измерений.
+
+Для проверки разброса значений измерителя был \num{5} раз последовательно взвешен балласт (один из аккумуляторов Robotino).
+Балласт в данном случае -- это масса, которая устанавливается на робота в целях равномерно загрузить колёса робота.
+Получились следующие показания: \qtylist{1387;1387;1387;1387;1386}{г}.
+
+Были произведены два варианта измерений: без балласта и с балластом.
+Показания измерений и оценки погрешности приведены в таблицах \ref{tab:nonuniform_load} и \ref{tab:uniform_load}.
+
+\begin{table}[H]
+    \centering
+    \caption{Распределение массы робота по колёсам без балласта}
+    \label{tab:nonuniform_load}
+    \sisetup{
+        round-mode = places,
+        round-precision = 1
+    }%
+    \begin{tabular}{S[round-mode = none]SSS}
+         & \multicolumn{3}{c}{Распределение массы по колёсам, \unit{г}} \\ \cmidrule(lr){2-4}
+        {№ измерения} & {1-ое} & {2-ое} & {3-е} \\
+        \midrule
+        1 & 2812 & > 5200 & 3268 \\
+        2 & 2593 & > 5200 & 3210 \\
+        3 & 3433 & 4905 & 2904 \\
+        4 & 3616 & 4922 & 2981 \\
+        5 & 3045 & > 5200 & 3105 \\
+        \midrule
+        {среднее} & 3099.8 & 5085.4 & 3093.6 \\
+        {среднеквадратическое отклонение} & 424.31 & 157.04 & 152.25 \\
+        {доверительные границы (P = 0.95)} & 189.758 & 70.229 & 68.088 \\
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Распределение массы робота по колёсам с балластом}
+    \label{tab:uniform_load}
+    \sisetup{
+        round-mode = places,
+        round-precision = 1
+    }%
+    \begin{tabular}{S[round-mode = none]SSS}
+         & \multicolumn{3}{c}{Распределение массы по колёсам, \unit{г}} \\ \cmidrule(lr){2-4}
+        {№ измерения} & {1-ое} & {2-ое} & {3-е} \\
+        \midrule
+        1 & 3861 & 4663 & 4069 \\
+        2 & 3353 & 4630 & 4238 \\
+        3 & 3981 & > 5200 & 3517 \\
+        4 & 3998 & > 5200 & 3762 \\
+        5 & 4235 & > 5200 & 3527 \\
+        \midrule
+        {среднее} & 3885.6 & 4978.6 & 3822.6 \\
+        {среднеквадратическое отклонение} & 327.140 & 303.388 & 323.153 \\
+        {доверительные границы (P = 0.95)} & 294.804 & 273.401 & 291.212 \\
+    \end{tabular}
+\end{table}
+
+Получены следующие оценки распределения массы робота/силы давления по колёсам:
+\begin{itemize}
+    \item без балласта
+    \begin{itemize}
+        \item первое колесо: \qty{3099.8 \pm 382.4}{г} или \qty{30.409 \pm 3.751}{Н};
+        \item второе колесо: \qty{> 5085.4 \pm 141.5}{г} или \qty{> 49.889 \pm 1.388}{Н};
+        \item третье колесо: \qty{3093.6 \pm 137.2}{г} или \qty{30.348 \pm 1.345}{Н};
+    \end{itemize}
+    \item с балластом
+    \begin{itemize}
+        \item первое колесо: \qty{3885.6 \pm 294.804}{г} или \qty{38.117 \pm 2.892}{Н};
+        \item второе колесо: \qty{> 4978.6 \pm 273.401}{г} или \qty{> 48.840 \pm 2.682}{Н};
+        \item третье колесо: \qty{3822.6 \pm 291.212}{г} или \qty{37.499 \pm 2.856}{Н};
+    \end{itemize}
+\end{itemize}

@@ -1,0 +1,3 @@
+[submodule "scripts/dc_motor_kalman_filter/3rdparty/als"]
+	path = scripts/dc_motor_kalman_filter/3rdparty/als
+	url = https://bitbucket.org/rawlings-group/als

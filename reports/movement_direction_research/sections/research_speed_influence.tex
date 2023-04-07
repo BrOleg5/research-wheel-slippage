@@ -1,0 +1,94 @@
+\section{Исследование влияния скорости на полученные зависимости}
+
+\subsection{Зависимость разницы скоростей робота по энкодерам и камере от тока по направлению движения}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/robot_delta_speed_vs_axis_current/speed_amplitude_influence/x_axis.pdf}
+        \caption{по оси X}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/robot_delta_speed_vs_axis_current/speed_amplitude_influence/y_axis.pdf}
+        \caption{по оси Y}
+    \end{subfigure} \\
+    \vspace{4pt}
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/robot_delta_speed_vs_axis_current/speed_amplitude_influence/rotation.pdf}
+        \caption{для вращательного движения}
+    \end{subfigure}
+    \caption{Зависимость разницы скоростей робота по энкодерам и камере от тока по направлению движения на разных поверхностях на разных скоростях}
+\end{figure}
+
+\subsection{Зависимость разницы скоростей колёс по энкодерам и камере от тока по направлению движения}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_delta_velocity_vs_motor_current/speed_amplitude_influence/motor 1.pdf}
+        \caption{двигатель 1}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_delta_velocity_vs_motor_current/speed_amplitude_influence/motor 2.pdf}
+        \caption{двигатель 2}
+    \end{subfigure} \\
+    \vspace{4pt}
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_delta_velocity_vs_motor_current/speed_amplitude_influence/motor 3.pdf}
+        \caption{двигатель 3}
+    \end{subfigure}
+    \caption{Зависимость разницы скоростей колёс по энкодерам и камере от тока по направлению движения на разных поверхностях на разных скоростях}
+\end{figure}
+
+\subsection{Влияние учёта кинематического коэффициента на распределение данных}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_slippage_vs_motor_current/speed_amplitude_influence/not_linearization/motor 1.pdf}
+        \caption{без коэффициента}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_slippage_vs_motor_current/speed_amplitude_influence/linearization/motor 1.pdf}
+        \caption{с коэффициентом}
+    \end{subfigure}
+    \caption{ЗВлияние учёта кинематического коэффициента на распределение данных для двигателя 1}
+\end{figure}
+
+\subsection{Зависимость проскальзывания от тока с учётом коэффициента}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_slippage_vs_motor_current/speed_amplitude_influence/linearization/motor 1.pdf}
+        \caption{двигатель 1}
+    \end{subfigure}
+    \hspace{0.005\textwidth}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_slippage_vs_motor_current/speed_amplitude_influence/linearization/motor 2.pdf}
+        \caption{двигатель 2}
+    \end{subfigure} \\
+    \vspace{4pt}
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{for_research_movement_direction/wheel_slippage_vs_motor_current/speed_amplitude_influence/linearization/motor 3.pdf}
+        \caption{двигатель 3}
+    \end{subfigure}
+    \caption{Зависимость проскальзывания от тока с учётом коэффициента на разных поверхностях на разных скоростях}
+\end{figure}
