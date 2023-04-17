@@ -1,7 +1,9 @@
 function plot_movement_delta_angle_graphs()
 % PLOT_MOVEMENT_DELTA_ANGLE_GRAPHS  Entry point
 
+lang = "ru";
 export_graph = true;
+set(groot, "defaultAxesFontName", "Arial");
 input_dataset_file = "output_files/datasets/for_research_movement_direction/one_surface_type/averaged_data.csv";
 output_dir = "output_files/graphs/for_research_movement_direction";
 
@@ -20,7 +22,7 @@ T = T(idx, :);
 
 plot_func = localfunctions;
 for i = 1:length(plot_func)
-    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir);
+    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir, 'Language', lang);
 end
 end
 %% Local functions
@@ -31,7 +33,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "vx", "vy"]);
@@ -52,9 +55,13 @@ for st = surftype.'
     ax.XTick = 0:10:350;
     ax.XLimitMethod = 'tight';
     ax.YLimitMethod = 'padded';
-    xlabel("Movement direction, ^\circ", "Interpreter", "tex");
-    ylabel("Delta angle, ^\circ", "Interpreter", "tex");
     ax.FontSize = 12;
+    xlabel_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                                "Направление движения, \circ"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["Delta angle, \circ", ...
+                                                "Рассогласование направления, \circ"]);
+    xlabel_translate(xlabel_dict, options.Language, 'Interpreter', 'tex');
+    ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "delta_movement_direction", ...
                               "between_set_point_and_camera");
@@ -86,11 +93,19 @@ ax = gca;
 ax.XTick = 0:10:350;
 ax.XLimitMethod = 'tight';
 ax.YLimitMethod = 'padded';
-xlabel("Movement direction, ^\circ", "Interpreter", "tex");
-ylabel("Delta angle, ^\circ", "Interpreter", "tex");
 ax.FontSize = 12;
-legend(string(surftype), 'Location', 'best', 'FontSize', 12);
+xlabel_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                            "Направление движения, \circ"]);
+ylabel_dict = containers.Map(["en", "ru"], ["Delta angle, \circ", ...
+                                            "Рассогласование направления, \circ"]);
+xlabel_translate(xlabel_dict, options.Language, 'Interpreter', 'tex');
+ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
 
+surf_str = string(surftype);
+legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+title(lgd, legend_title_dict(options.Language));
 if(options.ExportGraphs)
     output_dir = fullfile(options.ExportGraphFolder, "delta_movement_direction", ...
                           "between_set_point_and_camera");
@@ -111,7 +126,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "xcur", "ycur"]);
@@ -132,9 +148,13 @@ for st = surftype.'
     ax.XTick = 0:10:350;
     ax.XLimitMethod = 'tight';
     ax.YLimitMethod = 'padded';
-    xlabel("Movement direction, ^\circ", "Interpreter", "tex");
-    ylabel("Delta angle, ^\circ", "Interpreter", "tex");
     ax.FontSize = 12;
+    xlabel_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                                "Направление движения, \circ"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["Delta angle, \circ", ...
+                                                "Рассогласование направления, \circ"]);
+    xlabel_translate(xlabel_dict, options.Language, 'Interpreter', 'tex');
+    ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "delta_movement_direction", ...
                               "between_set_point_and_current");
@@ -156,7 +176,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "vx", "vy", "xcur", "ycur"]);
@@ -180,9 +201,13 @@ for st = surftype.'
     ax.XTick = 0:10:350;
     ax.XLimitMethod = 'tight';
     ax.YLimitMethod = 'padded';
-    xlabel("Movement direction, ^\circ", "Interpreter", "tex");
-    ylabel("Delta angle, ^\circ", "Interpreter", "tex");
     ax.FontSize = 12;
+    xlabel_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                                "Направление движения, \circ"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["Delta angle, \circ", ...
+                                                "Рассогласование направления, \circ"]);
+    xlabel_translate(xlabel_dict, options.Language, 'Interpreter', 'tex');
+    ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "delta_movement_direction", ...
                               "between_camera_and_current");
@@ -217,10 +242,19 @@ ax = gca;
 ax.XTick = 0:10:350;
 ax.XLimitMethod = 'tight';
 ax.YLimitMethod = 'padded';
-xlabel("Movement direction, ^\circ", "Interpreter", "tex");
-ylabel("Delta angle, ^\circ", "Interpreter", "tex");
 ax.FontSize = 12;
-legend(string(surftype), 'Location', 'best', 'FontSize', 12);
+xlabel_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                            "Направление движения, \circ"]);
+ylabel_dict = containers.Map(["en", "ru"], ["Delta angle, \circ", ...
+                                            "Рассогласование направления, \circ"]);
+xlabel_translate(xlabel_dict, options.Language, 'Interpreter', 'tex');
+ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
+
+surf_str = string(surftype);
+legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+title(lgd, legend_title_dict(options.Language));
 if(options.ExportGraphs)
     output_dir = fullfile(options.ExportGraphFolder, "delta_movement_direction", ...
                           "between_camera_and_current");

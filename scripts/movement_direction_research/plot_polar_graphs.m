@@ -1,7 +1,10 @@
 function plot_polar_graphs()
 % PLOT_POLAR_GRAPHS  Entry point
 
+lang = "ru";
 export_graph = true;
+set(groot, "defaultAxesFontName", "Arial");
+set(groot, "defaultPolarAxesFontName", "Arial");
 input_dataset_file = "output_files/datasets/for_research_movement_direction/one_surface_type/averaged_data.csv";
 output_dir = "output_files/graphs/for_research_movement_direction";
 
@@ -20,7 +23,7 @@ T = T(idx, :);
 
 plot_func = localfunctions;
 for i = 1:length(plot_func)
-    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir);
+    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir, 'Language', lang);
 end
 end
 %% Local functions
@@ -31,7 +34,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"],
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "m1cur", "m2cur", "m3cur"]);
@@ -46,9 +50,11 @@ for st = surftype.'
         mot_str = strcat("m", m, "cur");
         polarplot(deg2rad(sample_T.movedir), sample_T.(mot_str), 'LineStyle', 'none', ...
                   'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', 'black');
-        pax = gca;
-        % Add degree symbol to axis ticks
-        pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        if(isMATLABReleaseOlderThan("R2022a"))
+            % Add degree symbol to axis ticks
+            pax = gca;
+            pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        end
         if(options.ExportGraphs)
             output_dir = fullfile(options.ExportGraphFolder, "polar_current", ...
                                      "half_second_averaging", surf_str);
@@ -77,10 +83,16 @@ for m = ["1", "2", "3"]
         hold on;
         grid on;
     end
-    % Add degree symbol to axis ticks
-    pax = gca;
-    pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
-    legend(string(surftype), "Location", "best");
+    if(isMATLABReleaseOlderThan("R2022a"))
+        % Add degree symbol to axis ticks
+        pax = gca;
+        pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+    end
+    surf_str = string(surftype);
+    legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+    lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+    legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+    title(lgd, legend_title_dict(options.Language));
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "polar_current", ...
                                  "half_second_averaging");
@@ -102,7 +114,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"],
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "w1vel", "w2vel", "w3vel"]);
@@ -117,9 +130,11 @@ for st = surftype.'
         mot_str = strcat("w", w, "vel");
         polarplot(deg2rad(sample_T.movedir), abs(sample_T.(mot_str)), 'LineStyle', 'none', ...
                   'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', 'black');
-        % Add degree symbol to axis ticks
-        pax = gca;
-        pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        if(isMATLABReleaseOlderThan("R2022a"))
+            % Add degree symbol to axis ticks
+            pax = gca;
+            pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        end
         if(options.ExportGraphs)
             output_dir = fullfile(options.ExportGraphFolder, "polar_velocity", ...
                                      "half_second_averaging", surf_str);
@@ -142,7 +157,8 @@ arguments
     options.ExportGraphExtensions {mustBeNonzeroLengthText, mustBeText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"],
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "w1slip", "w2slip", "w3slip"]);
@@ -157,9 +173,11 @@ for st = surftype.'
         mot_str = strcat("w", m, "slip");
         polarplot(deg2rad(sample_T.movedir), sample_T.(mot_str), 'LineStyle', 'none', ...
                   'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', 'black');
-        pax = gca;
-        % Add degree symbol to axis ticks
-        pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        if(isMATLABReleaseOlderThan("R2022a"))
+            % Add degree symbol to axis ticks
+            pax = gca;
+            pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        end
         if(options.ExportGraphs)
             output_dir = fullfile(options.ExportGraphFolder, "polar_slippage", ...
                                      "half_second_averaging", surf_str);
@@ -182,7 +200,8 @@ arguments
     options.ExportGraphExtensions {mustBeNonzeroLengthText, mustBeText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"],
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "ddvx", "ddvy", "ddomega"]);
@@ -198,9 +217,11 @@ for st = surftype.'
         fig = figure('Name', strcat(surf_str, " ", fig_names(j)));
         polarplot(deg2rad(sample_T.movedir), abs(sample_T.(varnames(j))), 'LineStyle', 'none', 'Marker', '.', ...
                   'MarkerSize', 5, 'MarkerEdgeColor', 'black');
-        pax = gca;
-        % Add degree symbol to axis ticks
-        pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        if(isMATLABReleaseOlderThan("R2022a"))
+            % Add degree symbol to axis ticks
+            pax = gca;
+            pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        end
         if(options.ExportGraphs)
             output_dir = fullfile(options.ExportGraphFolder, "polar_delta_speed", ...
                                      "half_second_averaging", surf_str);
@@ -223,7 +244,8 @@ arguments
     options.ExportGraphExtensions {mustBeNonzeroLengthText, mustBeText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"],
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "m1cur", "m2cur", "m3cur"]);
@@ -242,9 +264,11 @@ for st = surftype.'
         mean_current = [mean_current; mean_current(1)];
         polarplot(deg2rad(move_dir), mean_current, 'LineStyle', '-', 'Color', 'black', ...
                   'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', 'black');
-        pax = gca;
-        % Add degree symbol
-        pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        if(isMATLABReleaseOlderThan("R2022a"))
+            % Add degree symbol to axis ticks
+            pax = gca;
+            pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        end
         if(options.ExportGraphs)
             output_dir = fullfile(options.ExportGraphFolder, "polar_current", "full_averaging", surf_str);
             if(~isfolder(output_dir))
@@ -271,12 +295,18 @@ for m = ["1", "2", "3"]
         surf_str = string(surftype(i));
         polarplot(deg2rad(move_dir), mean_current, 'LineStyle', '-', 'Color', surface_color_dict(surf_str), ...
                   'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', surface_color_dict(surf_str));
-        pax = gca;
         hold on;
     end
-    % Add degree symbol
-    pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
-    legend(string(surftype), "Location", "best");
+    if(isMATLABReleaseOlderThan("R2022a"))
+        % Add degree symbol to axis ticks
+        pax = gca;
+        pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+    end
+    surf_str = string(surftype);
+    legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+    lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+    legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+    title(lgd, legend_title_dict(options.Language));
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "polar_current", "full_averaging");
         if(~isfolder(output_dir))

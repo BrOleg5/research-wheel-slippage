@@ -11,7 +11,8 @@ if check_dependency(input_dataset_file, @process_one_surface_type_dataset)
     % Check data is processed
     opts = detectImportOptions(input_dataset_file, "VariableDescriptionsLine", 1, ...
                                "VariableUnitsLine", 2, "VariableNamesLine", 3);
-    if(length(opts.VariableNames) ~= 48)
+%     if(length(opts.VariableNames) ~= 48)
+    if(length(opts.VariableNames) ~= 51)
         fprintf("'%s' isn't processed.\nRun %s() function.\n", input_dataset_file, "process_one_surface_type_dataset");
         process_one_surface_type_dataset();
     end

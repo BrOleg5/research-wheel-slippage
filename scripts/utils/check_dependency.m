@@ -10,7 +10,11 @@ existance = exist_files(dependency);
 if(any(~existance))
     fprintf("'%s' doesn't exist.\n", dependency(~existance));
     for i = 1:length(func_handle)
-        func = func_handle{i};
+        if(iscell(func_handle))
+            func = func_handle{i};
+        elseif(length(func_handle) == 1)
+            func = func_handle;
+        end
         assert(isa(func, "function_handle"), "func isn't function handle.");
         s = functions(func);
         fprintf("Run %s() function.\n", s.function)

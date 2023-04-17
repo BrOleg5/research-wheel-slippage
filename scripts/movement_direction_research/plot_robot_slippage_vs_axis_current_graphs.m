@@ -1,7 +1,9 @@
 function plot_robot_slippage_vs_axis_current_graphs()
 % PLOT_ROBOT_SLIPPAGE_VS_AXIS_CURRENT_GRAPHS  Entry point
 
+lang = "ru";
 export_graph = true;
+set(groot, "defaultAxesFontName", "Arial");
 input_dataset_file = "output_files/datasets/for_research_movement_direction/one_surface_type/averaged_data.csv";
 output_dir = "output_files/graphs/for_research_movement_direction";
 
@@ -20,7 +22,7 @@ T = T(idx, :);
 
 plot_func = localfunctions;
 for i = 1:length(plot_func)
-    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir);
+    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir, 'Language', lang);
 end
 end
 %% Local functions
@@ -31,7 +33,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "ddvx", "ddvy", "ddomega"]);
@@ -57,29 +60,37 @@ for st = surftype.'
         end
         cur = sample_T.(varcur(j));
         n = length(movedir);
-        legends = strings(n, 1);
         colors = generate_distrinct_colors(n);
         for k = 1:n
             idx = sample_T.movedir == movedir(k);
             plot(cur(idx), ddspeed(idx), "LineStyle", "none", "Marker", ".", "MarkerSize", 10, ...
                  "MarkerEdgeColor", colors(k, :));
-            legends(k) = string(movedir(k)) + char(176);
         end
         switch j
             case 1
-                xlabel("Current along X axis, A");
-                ylabel("v_{x enc} - v_{x cam}, mm/s", 'Interpreter', 'tex');
+                xlabel_dict = containers.Map(["en", "ru"], ["Current along X axis, A", "Ток по оси X, А"]);
+                ylabel_dict = containers.Map(["en", "ru"], ["v_{x enc} - v_{x cam}, mm/s", ...
+                                                            "v_{x энк} - v_{x кам}, мм/с"]);
+                xlabel_translate(xlabel_dict, options.Language);
+                ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
             case 2
-                xlabel("Current along Y axis, A");
-                ylabel("v_{y enc} - v_{y cam}, mm/s", 'Interpreter', 'tex');
+                xlabel_dict = containers.Map(["en", "ru"], ["Current along Y axis, A", "Ток по оси Y, А"]);
+                ylabel_dict = containers.Map(["en", "ru"], ["v_{y enc} - v_{y cam}, mm/s", ...
+                                                            "v_{y энк} - v_{y кам}, мм/с"]);
+                xlabel_translate(xlabel_dict, options.Language);
+                ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
             case 3
-                xlabel("Rotational current, A");
-                ylabel("\omega_{enc} - \omega_{cam}, rad/s", 'Interpreter', 'tex');
+                xlabel_dict = containers.Map(["en", "ru"], ["Rotational current, A", "Ток вращения, А"]);
+                ylabel_dict = containers.Map(["en", "ru"], ["\omega_{enc} - \omega_{cam}, rad/s", ...
+                                                            "\omega_{энк} - \omega_{кам}, рад/с"]);
+                xlabel_translate(xlabel_dict, options.Language);
+                ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
         end
-        lgd = legend(legends, 'Location', 'bestoutside', 'NumColumns', 2, 'FontName', 'Arial', 'FontSize', 12);
-        lgd.Title.String = "Directions";
+        lgd = legend(string(movedir), 'Location', 'bestoutside', 'NumColumns', 2, 'FontSize', 12);
+        legend_title_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                                          "Направление движения, \circ"]);
+        title(lgd, legend_title_dict(options.Language), 'Interpreter', 'tex');
         ax = gca;
-        ax.FontName = "Arial";
         ax.FontSize = 14;
         if(options.ExportGraphs)
             output_dir = fullfile(options.ExportGraphFolder, "robot_delta_speed_vs_axis_current", ...
@@ -104,7 +115,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "xcur", "ycur", "ddspeedvec"]);
@@ -120,20 +132,22 @@ for st = surftype.'
     hold on;
     cur = sqrt(sample_T.xcur.^2 + sample_T.ycur.^2);
     n = length(movedir);
-    legends = strings(n, 1);
     colors = generate_distrinct_colors(n);
     for k = 1:n
         idx = sample_T.movedir == movedir(k);
         plot(cur(idx), sample_T.ddspeedvec(idx) * 1e3, "LineStyle", "none", "Marker", ".", ...
              "MarkerSize", 10, "MarkerEdgeColor", colors(k, :));
-        legends(k) = string(num2str(movedir(k))) + char(176);
     end
-    xlabel("Current, A");
-    ylabel("v_{x enc} - v_{x cam}, mm/s", 'Interpreter', 'tex');
-    lgd = legend(legends, 'Location', 'bestoutside', 'NumColumns', 2, 'FontName', 'Arial', 'FontSize', 12);
-    lgd.Title.String = "Directions";
+    xlabel_dict = containers.Map(["en", "ru"], ["Current vector, A", "Вектор тока, А"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["v_{enc} - v_{cam}, mm/s", ...
+                                                "v_{энк} - v_{кам}, мм/с"]);
+    xlabel_translate(xlabel_dict, options.Language);
+    ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
+    lgd = legend(string(movedir), 'Location', 'bestoutside', 'NumColumns', 2, 'FontSize', 12);
+    legend_title_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                                      "Направление движения, \circ"]);
+    title(lgd, legend_title_dict(options.Language), 'Interpreter', 'tex');
     ax = gca;
-    ax.FontName = "Arial";
     ax.FontSize = 14;
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "robot_delta_speed_vector_vs_current_vector", ...
@@ -160,11 +174,18 @@ for i = 1:length(surftype)
     plot(cur, sample_T.ddspeedvec * 1e3, "LineStyle", "none", "Marker", ".", ...
          "MarkerSize", 10, "MarkerEdgeColor", surface_color_dict(surf_str));
 end
-xlabel("Current, A");
-ylabel("v_{enc} - v_{cam}, mm/s", 'Interpreter', 'tex');
-legend(string(surftype), 'Location', 'best');
+xlabel_dict = containers.Map(["en", "ru"], ["Current vector, A", "Вектор тока, А"]);
+ylabel_dict = containers.Map(["en", "ru"], ["v_{enc} - v_{cam}, mm/s", ...
+                                            "v_{энк} - v_{кам}, мм/с"]);
+xlabel_translate(xlabel_dict, options.Language);
+ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
+
+surf_str = string(surftype);
+legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+title(lgd, legend_title_dict(options.Language));
 ax = gca;
-ax.FontName = "Arial";
 ax.FontSize = 14;
 if(options.ExportGraphs)
     output_dir = fullfile(options.ExportGraphFolder, "robot_delta_speed_vector_vs_current_vector", ...
@@ -186,7 +207,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "xcur", "ycur", "rotcur", ...
@@ -214,29 +236,37 @@ for st = surftype.'
         end
         cur = sample_T.(varcur(j));
         n = length(movedir);
-        legends = strings(n, 1);
         colors = generate_distrinct_colors(n);
         for k = 1:n
             idx = sample_T.movedir == movedir(k);
             plot(abs(cur(idx)), abs(ddspeed(idx)), "LineStyle", "none", "Marker", ".", "MarkerSize", 10, ...
                  "MarkerEdgeColor", colors(k, :));
-            legends(k) = string(num2str(movedir(k))) + char(176);
         end
         switch j
             case 1
-                xlabel("Current along X axis, A");
-                ylabel("v_{x enc} - v_{x cam}, mm/s", 'Interpreter', 'tex');
+                xlabel_dict = containers.Map(["en", "ru"], ["Current along X axis, A", "Ток по оси X, А"]);
+                ylabel_dict = containers.Map(["en", "ru"], ["v_{x enc} - v_{x cam}, mm/s", ...
+                                                            "v_{x энк} - v_{x кам}, мм/с"]);
+                xlabel_translate(xlabel_dict, options.Language);
+                ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
             case 2
-                xlabel("Current along Y axis, A");
-                ylabel("v_{y enc} - v_{y cam}, mm/s", 'Interpreter', 'tex');
+                xlabel_dict = containers.Map(["en", "ru"], ["Current along Y axis, A", "Ток по оси Y, А"]);
+                ylabel_dict = containers.Map(["en", "ru"], ["v_{y enc} - v_{y cam}, mm/s", ...
+                                                            "v_{y энк} - v_{y кам}, мм/с"]);
+                xlabel_translate(xlabel_dict, options.Language);
+                ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
             case 3
-                xlabel("Rotational current, A");
-                ylabel("\omega_{enc} - \omega_{cam}, rad/s", 'Interpreter', 'tex');
+                xlabel_dict = containers.Map(["en", "ru"], ["Rotational current, A", "Ток вращения, А"]);
+                ylabel_dict = containers.Map(["en", "ru"], ["\omega_{enc} - \omega_{cam}, rad/s", ...
+                                                            "\omega_{энк} - \omega_{кам}, рад/с"]);
+                xlabel_translate(xlabel_dict, options.Language);
+                ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
         end
-        lgd = legend(legends, 'Location', 'bestoutside', 'NumColumns', 2, 'FontName', 'Arial', 'FontSize', 12);
-        lgd.Title.String = "Directions";
+        lgd = legend(string(movedir), 'Location', 'bestoutside', 'NumColumns', 2, 'FontSize', 12);
+        legend_title_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                                          "Направление движения, \circ"]);
+        title(lgd, legend_title_dict(options.Language), 'Interpreter', 'tex');
         ax = gca;
-        ax.FontName = "Arial";
         ax.FontSize = 14;
         if(options.ExportGraphs)
             output_dir = fullfile(options.ExportGraphFolder, "robot_delta_speed_vs_axis_current", ...
@@ -271,19 +301,32 @@ for j = 1:3
         surf_str = string(surftype(i));
         plot(abs(cur), abs(ddspeed), "LineStyle", "none", "Marker", ".", "MarkerSize", 10, ...
              "MarkerEdgeColor", surface_color_dict(surf_str));
-        switch j
-            case 1
-                xlabel("Current along X axis, A");
-                ylabel("v_{x enc} - v_{x cam}, mm/s", 'Interpreter', 'tex');
-            case 2
-                xlabel("Current along Y axis, A");
-                ylabel("v_{y enc} - v_{y cam}, mm/s", 'Interpreter', 'tex');
-            case 3
-                xlabel("Rotational current, A");
-                ylabel("\omega_{enc} - \omega_{cam}, rad/s", 'Interpreter', 'tex');
-        end
     end
-    legend(string(surftype), 'Location', 'best');
+    switch j
+        case 1
+            xlabel_dict = containers.Map(["en", "ru"], ["Current along X axis, A", "Ток по оси X, А"]);
+            ylabel_dict = containers.Map(["en", "ru"], ["v_{x enc} - v_{x cam}, mm/s", ...
+                                                        "v_{x энк} - v_{x кам}, мм/с"]);
+            xlabel_translate(xlabel_dict, options.Language);
+            ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
+        case 2
+            xlabel_dict = containers.Map(["en", "ru"], ["Current along Y axis, A", "Ток по оси Y, А"]);
+            ylabel_dict = containers.Map(["en", "ru"], ["v_{y enc} - v_{y cam}, mm/s", ...
+                                                        "v_{y энк} - v_{y кам}, мм/с"]);
+            xlabel_translate(xlabel_dict, options.Language);
+            ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
+        case 3
+            xlabel_dict = containers.Map(["en", "ru"], ["Rotational current, A", "Ток вращения, А"]);
+            ylabel_dict = containers.Map(["en", "ru"], ["\omega_{enc} - \omega_{cam}, rad/s", ...
+                                                        "\omega_{энк} - \omega_{кам}, рад/с"]);
+            xlabel_translate(xlabel_dict, options.Language);
+            ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
+    end
+    surf_str = string(surftype);
+    legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+    lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+    legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+    title(lgd, legend_title_dict(options.Language));
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "robot_delta_speed_vs_axis_current", ...
                               "unsigned_delta_speed", "common_graphs");

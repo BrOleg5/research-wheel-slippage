@@ -2,7 +2,7 @@ function union_one_surface_type_dataset(input_dataset_folder, output_dataset_fil
 % UNION_SURFACE_TYPE_DATASET Entry point
 
 arguments
-    input_dataset_folder {mustBeTextScalar, mustBeNonzeroLengthText} = "datasetsfor_research_movement_direction/one_surface_type",
+    input_dataset_folder {mustBeTextScalar, mustBeNonzeroLengthText} = "datasets/for_research_movement_direction/one_surface_type",
     output_dataset_file {mustBeTextScalar, mustBeNonzeroLengthText} = "output_files/datasets/for_research_movement_direction/one_surface_type/no_averaged_data.csv",
     surf_type {mustBeText, mustBeNonempty, mustBeNonzeroLengthText} = ["table", "gray", "green"]
 end

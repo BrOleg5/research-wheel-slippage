@@ -1,8 +1,9 @@
 function plot_wheel_velocity_vs_motor_current()
 % PLOT_WHEEL_VELOCITY_VS_MOTOR_CURRENT Entry point
 
+lang = "ru";
 export_graph = true;
-
+set(groot, "defaultAxesFontName", "Arial");
 prefix_path = "output_files/datasets/for_research_movement_direction/one_surface_type";
 dataset_file = fullfile(prefix_path, ["no_averaged_data.csv", "averaged_data.csv"]);
 
@@ -25,7 +26,8 @@ for i = 1:length(dataset_file)
     T = T(idx, :);
 
     for j = 1:length(plot_func)
-        plot_func{j}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir(i));
+        plot_func{j}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir(i), ...
+                     'Language', lang);
     end
 end
 end
@@ -37,7 +39,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"],
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "m1setvel", "m2setvel", "m3setvel", ...
@@ -73,10 +76,14 @@ for st = surftype.'
                  "LineStyle", "none", "Marker", ".", "MarkerSize", 10, "MarkerEdgeColor", colors(k, :));
             legends(k) = sprintf("%.5f", setvel(k));
         end
-        xlabel("Current, A");
-        ylabel("Velocity, rad/s");
+        xlabel_dict = containers.Map(["en", "ru"], ["Current, A", "Ток, А"]);
+        ylabel_dict = containers.Map(["en", "ru"], ["Velocity, rad/s", "Угловая скорость, рад/с"]);
+        xlabel_translate(xlabel_dict, options.Language);
+        ylabel_translate(ylabel_dict, options.Language);
         lgd = legend(legends, 'Location', 'best', 'FontSize', 12);
-        lgd.Title.String = "Set velocity, rad/s";
+        legend_title_dict = containers.Map(["en", "ru"], ["Set velocity, rad/s", ...
+                                                          "Уставка угловой скорости, рад/с"]);
+        title(lgd, legend_title_dict(options.Language));
         ax = gca;
         ax.FontSize = 14;
         if(options.ExportGraphs)
@@ -100,7 +107,8 @@ arguments
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"],
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "m1setvel", "m2setvel", "m3setvel", ...
@@ -131,9 +139,15 @@ for i = 1:3
         plot(sample_T.(curstr), sample_T.(velstr), "LineStyle", "none", "Marker", ".", ...
              "MarkerSize", 10, "MarkerEdgeColor", surface_color_dict(surf_str));
     end
-    xlabel("Current, A");
-    ylabel("Velocity, rad/s");
-    legend(string(surftype), 'Location', 'best');
+    xlabel_dict = containers.Map(["en", "ru"], ["Current, A", "Ток, А"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["Velocity, rad/s", "Угловая скорость, рад/с"]);
+    xlabel_translate(xlabel_dict, options.Language);
+    ylabel_translate(ylabel_dict, options.Language);
+    surf_str = string(surftype);
+    legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+    lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+    legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+    title(lgd, legend_title_dict(options.Language));
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "separate_with_surface_type");
         if(~isfolder(output_dir))

@@ -1,7 +1,9 @@
 function plot_data_with_speed_amplitude()
 % PLOT_SLIPPAGE_VS_CURRENT_WITH_SEVERAL_SPEED_GRAPHS  Entry point
 
+lang = "ru";
 export_graph = true;
+set(groot, "defaultAxesFontName", "Arial");
 input_dataset_file = "output_files/datasets/for_research_movement_direction/one_surface_type/averaged_data.csv";
 output_dir = "output_files/graphs/for_research_movement_direction";
 
@@ -17,20 +19,21 @@ T = readtable(input_dataset_file, opts);
 
 plot_func = localfunctions;
 for i = 1:length(plot_func)
-    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir);
+    plot_func{i}(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', output_dir, 'Language', lang);
 end
 plot_wheel_slippage_vs_motor_current(T, 'ExportGraphs', export_graph, 'ExportGraphFolder', ...
-                                     output_dir, 'ApplyLinearization', true);
+                                     output_dir, 'ApplyLinearization', true, 'Language', lang);
 end
 %% Local functions
 function plot_robot_unsigned_delta_speed_vs_axis_current(T, options)
 arguments
     T table,
-    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false
+    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false,
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
-        "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+        "eps", "emf", "pdf"])} = ["emf", "pdf"],
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "xcur", "ycur", "rotcur", "ddvx", ...
@@ -45,17 +48,20 @@ speedamp = unique(T.speedamp);
 n = length(speedamp);
 surftype = unique(T.surftype);
 surftype(surftype == "table") = [];
-m = length(surftype);
+surf_str = string(surftype);
+h = length(surftype);
 for j = 1:3
     fig = figure("Name", fig_names(j));
     grid on;
     hold on;
-    legends = strings(3*m, 1);
-    for i = 1:m
-        surf_str = string(surftype(i));
+    en_legends = strings(3*h, 1);
+    ru_legends = strings(3*h, 1);
+    for i = 1:h
         for k = 1:n
             leg_idx = (i-1)*n + k;
-            legends(leg_idx) = sprintf("%s surface %.1f m/s", surf_str, speedamp(k));
+            en_legends(leg_idx) = sprintf("%s surface %.1f m/s", surf_str(i), speedamp(k));
+            ru_legends(leg_idx) = sprintf("%s поверхность %.1f м/с", translate_surface(surf_str(i)), ...
+                                          speedamp(k));
             idx = (T.surftype == surftype(i)) & (T.speedamp == speedamp(k));
             sample_T = T(idx, :);
             switch j
@@ -70,16 +76,26 @@ for j = 1:3
     end
     switch j
         case 1
-            xlabel("Current along X axis, A");
-            ylabel("v_{x enc} - v_{x cam}, mm/s", 'Interpreter', 'tex');
+            xlabel_dict = containers.Map(["en", "ru"], ["Current along X axis, A", "Ток по оси X, А"]);
+            ylabel_dict = containers.Map(["en", "ru"], ["v_{x enc} - v_{x cam}, mm/s", ...
+                                                        "v_{x энк} - v_{x кам}, мм/с"]);
+            xlabel_translate(xlabel_dict, options.Language);
+            ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
         case 2
-            xlabel("Current along Y axis, A");
-            ylabel("v_{y enc} - v_{y cam}, mm/s", 'Interpreter', 'tex');
+            xlabel_dict = containers.Map(["en", "ru"], ["Current along Y axis, A", "Ток по оси Y, А"]);
+            ylabel_dict = containers.Map(["en", "ru"], ["v_{y enc} - v_{y cam}, mm/s", ...
+                                                        "v_{y энк} - v_{y кам}, мм/с"]);
+            xlabel_translate(xlabel_dict, options.Language);
+            ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
         case 3
-            xlabel("Rotational current, A");
-            ylabel("\omega_{enc} - \omega_{cam}, rad/s", 'Interpreter', 'tex');
+            xlabel_dict = containers.Map(["en", "ru"], ["Rotational current, A", "Ток вращения, А"]);
+            ylabel_dict = containers.Map(["en", "ru"], ["\omega_{enc} - \omega_{cam}, rad/s", ...
+                                                        "\omega_{энк} - \omega_{кам}, рад/с"]);
+            xlabel_translate(xlabel_dict, options.Language);
+            ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
     end
-    legend(legends, 'Location', 'best');
+    legend_dict = containers.Map(["en", "ru"], {en_legends, ru_legends});
+    legend_translate(legend_dict, options.Language, 'Location', 'best');
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "robot_delta_speed_vs_axis_current", ...
                               "speed_amplitude_influence");
@@ -97,11 +113,12 @@ end
 function plot_wheel_delta_velocity_vs_motor_current(T, options)
 arguments
     T table,
-    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false
+    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false,
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
-        "eps", "emf", "pdf"])} = ["emf", "pdf"]
-    options.ExportGraphFolder {mustBeText, mustBeNonempty}
+        "eps", "emf", "pdf"])} = ["emf", "pdf"],
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 check_table_vars(T.Properties.VariableNames, ["surftype", "m1cur", "m2cur", "m3cur", "w1ddvel", ...
@@ -119,12 +136,15 @@ for m = 1:3
     fig = figure("Name", fig_name);
     grid on;
     hold on;
-    legends = strings(3*h, 1);
+    en_legends = strings(3*h, 1);
+    ru_legends = strings(3*h, 1);
     for i = 1:h
         surf_str = string(surftype(i));
         for k = 1:n
             leg_idx = (i-1)*n + k;
-            legends(leg_idx) = sprintf("%s surface %.1f m/s", surf_str, speedamp(k));
+            en_legends(leg_idx) = sprintf("%s surface %.1f m/s", surf_str, speedamp(k));
+            ru_legends(leg_idx) = sprintf("%s поверхность %.1f м/с", translate_surface(surf_str), ...
+                                          speedamp(k));
             idx = (T.surftype == surftype(i)) & (T.speedamp == speedamp(k));
             sample_T = T(idx, :);
             cur = sample_T.("m" + num2str(m) + "cur");
@@ -133,9 +153,14 @@ for m = 1:3
                  "MarkerEdgeColor", colors(leg_idx));
         end
     end
-    xlabel("Current, A");
-    ylabel("\omega_{enc} - \omega_{cam}, rad/s");
-    legend(legends, 'Location', 'best');
+    xlabel_dict = containers.Map(["en", "ru"], ["Current, A", "Ток, А"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["\omega_{enc} - \omega_{cam}, rad/s", ...
+                                                "\omega_{энк} - \omega_{кам}, рад/с"]);
+    xlabel_translate(xlabel_dict, options.Language);
+    ylabel_translate(ylabel_dict, options.Language, 'Interpreter', 'tex');
+
+    legend_dict = containers.Map(["en", "ru"], {en_legends, ru_legends});
+    legend_translate(legend_dict, options.Language, 'Location', 'best');
     ax = gca;
     ax.XLim(1) = 0;
     ax.YLim(1) = 0;
@@ -156,12 +181,13 @@ end
 function plot_wheel_slippage_vs_motor_current(T, options)
 arguments
     T table,
-    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false
+    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false,
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
-        "eps", "emf", "pdf"])} = ["emf", "pdf"]
+        "eps", "emf", "pdf"])} = ["emf", "pdf"],
     options.ExportGraphFolder {mustBeText, mustBeNonempty},
-    options.ApplyLinearization (1, 1) {mustBeNumericOrLogical} = false
+    options.ApplyLinearization (1, 1) {mustBeNumericOrLogical} = false,
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 if(options.ApplyLinearization)
@@ -184,12 +210,15 @@ for m = 1:3
     fig = figure("Name", fig_name);
     grid on;
     hold on;
-    legends = strings(3*h, 1);
+    en_legends = strings(3*h, 1);
+    ru_legends = strings(3*h, 1);
     for i = 1:h
         surf_str = string(surftype(i));
         for k = 1:n
             leg_idx = (i-1)*n + k;
-            legends(leg_idx) = sprintf("%s surface %.1f m/s", surf_str, speedamp(k));
+            en_legends(leg_idx) = sprintf("%s surface %.1f m/s", surf_str, speedamp(k));
+            ru_legends(leg_idx) = sprintf("%s поверхность %.1f м/с", translate_surface(surf_str), ...
+                                          speedamp(k));
             idx = (T.surftype == surftype(i)) & (T.speedamp == speedamp(k));
             sample_T = T(idx, :);
             cur = sample_T.("m" + num2str(m) + "cur");
@@ -202,9 +231,12 @@ for m = 1:3
                  "MarkerEdgeColor", colors(leg_idx));
         end
     end
-    xlabel("Current, A");
-    ylabel("Slippage");
-    legend(legends, 'Location', 'best');
+    xlabel_dict = containers.Map(["en", "ru"], ["Current, A", "Ток, А"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["Slippage", "Проскальзывание"]);
+    xlabel_translate(xlabel_dict, options.Language);
+    ylabel_translate(ylabel_dict, options.Language);
+    legend_dict = containers.Map(["en", "ru"], {en_legends, ru_legends});
+    legend_translate(legend_dict, options.Language, 'Location', 'best');
     ax = gca;
     ax.XLim(1) = 0;
     ax.YLim(1) = 0;

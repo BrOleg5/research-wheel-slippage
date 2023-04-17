@@ -70,7 +70,7 @@ end
 %           0,   29.57];
 
 R_d = [4.80e-3,     0;
-          0,   29.57];
+            0,   29.57];
 
 if(~issymmetric(R_d))
     error("Measurement noise covariance matrix R doesn't symmetric.");
