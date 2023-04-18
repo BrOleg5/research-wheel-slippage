@@ -1,0 +1,39 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{TPUstyle}
+
+\graphicspath{ {../../output_files/graphs}, {../images/research_movement_direction} }
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{7cm}
+    {\huge \bfseries Исследование влияния направления движения робота на величину проскальзывания \par}
+    \vspace{2cm}
+    {\Large \itshape Филипас Александр Александрович\par}
+    {\Large \itshape Беляев Александр Сергеевич\par}
+    {\Large \itshape Брылев Олег Александрович\par}
+    \vfill
+    \today
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Планирование эксперимента}
+
+Проведём дискретизацию направление движения по \ang{5}.
+Направление движения робота задаётся от оси $X$ в локальной системе координат робота от \ang{0} до \ang{360}.
+В эксперименте участвуют 3 типа поверхности: стол, поверхность серого цвета, поверхность зелёного цвета.
+
+Каждый запуск длился примерно \qty{18}{с} (на самом деле чуть меньше) для скорости \qty{0.1}{м/с}, \qty{10}{с} для \qty{0.2}{м/с}, \qty{6}{с} для \qty{0.3}{м/с}.
+Период дискретизации равен примерно \qty{30}{мс} (в программе снятия было выставлено \qty{20}{мс}). Период снятия данных не постоянен.
+
+\include{sections/not_averaged_data}
+\include{sections/data_averaged_by_half_of_second}
+\include{sections/delta_angles}
+\include{sections/research_speed_influence}
+\include{sections/research_uniform_wheel_loads}
+
+\end{document}

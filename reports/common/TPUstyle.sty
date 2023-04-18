@@ -1,0 +1,228 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{TPUstyle}[LaTeX package for TPU documents: reports, course projects, master thesis]
+
+% Font
+\RequirePackage{fontspec}
+\setmainfont{Times New Roman}
+
+\RequirePackage[english,russian]{babel}
+
+% Page margins
+\RequirePackage{geometry}
+\geometry{top=20mm}
+\geometry{bottom=20mm}
+\geometry{left=30mm}
+\geometry{right=10mm}
+
+% Russian letters in formula
+\RequirePackage{mathtext}
+
+% Insert indent after sections and subsections
+\RequirePackage{indentfirst}
+
+% Set paragraph indent
+\setlength{\parindent}{15mm}
+
+% Spaces in Russian (French) typographic tradition
+\frenchspacing
+
+% Greeks letter in Russian typographic tradition
+\renewcommand{\epsilon}{\ensuremath{\varepsilon}}
+\renewcommand{\phi}{\ensuremath{\varphi}}
+\renewcommand{\kappa}{\ensuremath{\varkappa}}
+% Comparison operation etc. in Russian typographic tradition
+\renewcommand{\le}{\ensuremath{\leqslant}}
+\renewcommand{\leq}{\ensuremath{\leqslant}}
+\renewcommand{\ge}{\ensuremath{\geqslant}}
+\renewcommand{\geq}{\ensuremath{\geqslant}}
+\renewcommand{\emptyset}{\varnothing}
+
+% Addition math
+\RequirePackage{amsmath, amsfonts, amssymb, amsthm, mathtools}
+
+% Degree symbol
+\RequirePackage{textcomp, gensymb}
+
+% Smart common: $0,2$ --- number, $0, 2$ --- set
+\RequirePackage{icomma}
+
+% Formula numbering
+% Show number only for those formula that have reference (\ref{}, \eqref{}) in text 
+\mathtoolsset{showonlyrefs=true}
+
+% Images, figures and graphics
+\RequirePackage{graphicx}
+% Separation frame of \fbox{} from figure
+\setlength\fboxsep{3pt}
+% Line width of \fbox{} frame
+\setlength\fboxrule{1pt}
+
+% Tables
+\RequirePackage{array, tabularx, tabulary, booktabs}
+% Multirows in table
+\RequirePackage{multirow}
+% Common formatting of certain table cells
+\RequirePackage{makecell}
+% Create long table
+\RequirePackage{longtable}
+\RequirePackage[export]{adjustbox}
+
+% Line spacing
+\RequirePackage{setspace}
+% One-half spacing
+\onehalfspacing
+
+% Hyperlinks
+\RequirePackage{hyperref}
+\RequirePackage[usenames,dvipsnames,svgnames,table,rgb]{xcolor}
+\hypersetup{
+  unicode=true,
+  colorlinks=true,     % false: links in frame; true: color links
+  linkcolor=black,     % color of internal links
+  citecolor=black,     % color of bibliography links
+  filecolor=black,     % color of file links
+  urlcolor=black       % color of url links
+}
+
+% Text in several column on page
+\RequirePackage{multicol}
+
+% Simple setting of enums\items
+\RequirePackage{enumitem}
+
+% Figure and table caption
+\RequirePackage{caption}
+% Figure caption
+\captionsetup{
+  labelsep = endash,            % n dash as separator
+  figurename = Рисунок,         % Рисунок as figure name
+  justification = centering     % center alignment of caption
+}
+% Table caption
+\captionsetup[table]{
+  format=plain,
+  labelsep = endash,            % n dash as separator
+  justification = raggedright,  % left alignment of caption
+  singlelinecheck=false         % no indentation in table caption
+}
+
+% Subfigures
+\RequirePackage{subcaption}
+% Set cyrillic letter as label
+\renewcommand\thesubfigure{\asbuk{subfigure}}
+% Subfigure caption 
+\captionsetup[subfigure]{
+  labelformat=brace             % one brace after label
+}
+
+% Listings
+\RequirePackage{listings}
+% Background color for intext code piece
+\definecolor{backcolor}{rgb}{0.95,0.95,0.92}
+% Listing caption
+\captionsetup[lstlisting]{
+  justification = raggedright,  % left alignment of caption
+  singlelinecheck=false         % no indentation in table caption
+}
+% Shell intext style
+\lstdefinestyle{shellstyle}{
+  backgroundcolor=\color{backcolor},
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=true,
+  prebreak=\textbackslash
+}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codered}{rgb}{0.65,0,0}
+% Style for code in frame
+\lstdefinestyle{codestyle}{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=true,
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{blue},
+  stringstyle=\color{codered},
+  frame=single
+}
+% Intext code style
+\lstdefinestyle{codepiece}{
+  backgroundcolor=\color{backcolor},
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=true,
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{blue},
+  stringstyle=\color{codered}
+}
+% Inline code style
+\lstdefinestyle{inlinecode}{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\RequirePackage{float}
+
+\RequirePackage{comment}
+
+% For matrix rows/columns labels
+\RequirePackage{blkarray}
+
+% Add new four level of sectioning.
+% Set \paragraph command as 4 level section 
+% \RequirePackage{titlesec}
+% \setcounter{secnumdepth}{4}
+
+% Environments
+\makeatother
+
+% For box around Definition, Theorem
+\RequirePackage{mdframed}
+\theoremstyle{definition}
+\newmdtheoremenv[nobreak=true]{definition}{Определение}
+\newmdtheoremenv[nobreak=true]{theorem}{Теорема}
+\newmdtheoremenv[nobreak=true]{lemma}{Лемма}
+\newtheorem*{eg}{Пример}
+\newtheorem*{notation}{Обозначение}
+\theoremstyle{remark}
+\newtheorem*{remark}{Примечание}
+\newtheorem*{problem}{Задача}
+
+% End example environment with a small diamond (just like proof
+% environments end with a small square)
+\RequirePackage{etoolbox}
+\AtEndEnvironment{eg}{\null\hfill$\diamond$}
+
+% Fix some spacing
+% http://tex.stackexchange.com/questions/22119/how-can-i-change-the-spacing-before-theorems-with-amsthm
+\makeatletter
+\def\thm@space@setup{%
+  \thm@preskip=\parskip \thm@postskip=0pt
+}
+
+\makeatother
+
+% Todonotes and inline notes in fancy boxes
+\RequirePackage{todonotes}
+% Add some option in todo
+\newcommand{\TODO}[1]{\todo[inline]{#1}}
+
+% For loop
+\RequirePackage{pgffor}
+
+% Bibliography
+\RequirePackage{csquotes}
+\RequirePackage[backend=biber,bibencoding=utf8,sorting=count,maxcitenames=3,style=numeric]{biblatex}
+\addbibresource{bibliography.bib}
+
+% Print directories tree
+\RequirePackage{dirtree}
+\renewcommand*\DTstyle{\ttfamily\footnotesize}
+
+% % SI units
+\RequirePackage{siunitx}
+\input{siunitx.cfg}
+
+% Mathematical notation
+\renewcommand{\vec}[1]{\mathbold{#1}}
+\newcommand{\mat}[1]{\mathbold{#1}}

@@ -1,0 +1,39 @@
+% Font
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage[english,russian]{babel}
+
+% Russian letters in formula
+\usepackage{mathtext}
+
+% Spaces in Russian (French) typographic tradition
+\frenchspacing
+
+% Greeks letter in Russian typographic tradition
+\renewcommand{\epsilon}{\ensuremath{\varepsilon}}
+\renewcommand{\phi}{\ensuremath{\varphi}}
+\renewcommand{\kappa}{\ensuremath{\varkappa}}
+% Comparison operation etc. in Russian typographic tradition
+\renewcommand{\le}{\ensuremath{\leqslant}}
+\renewcommand{\leq}{\ensuremath{\leqslant}}
+\renewcommand{\ge}{\ensuremath{\geqslant}}
+\renewcommand{\geq}{\ensuremath{\geqslant}}
+\renewcommand{\emptyset}{\varnothing}
+
+% Addition math
+\usepackage{amsmath, amsfonts, amssymb, amsthm, mathtools}
+
+% Degree symbol
+\usepackage{textcomp, gensymb}
+
+% Smart common: $0,2$ --- number, $0, 2$ --- set
+\usepackage{icomma}
+
+% SI units
+\usepackage{siunitx}
+\input{../siunitx.cfg}
+
+% Mathematical notation
+\renewcommand{\vec}[1]{\mathbold{#1}}
+\newcommand{\mat}[1]{\mathbold{#1}}
