@@ -19,13 +19,13 @@ p = specify_estimated_parameters(mdl);
 % Load dataset
 train_data = readtable("datasets\dc_motor_model_identification\data_for_identification_without_integral.csv", ...
                        "NumHeaderLines", 2);
-train_data = process_dataset(train_data);
+train_data = process_identification_dataset(train_data);
 [train_data, train_tau] = sync_reference_and_measurements(train_data);
 fprintf(logID, "Train tau = %.8g s\n", train_tau);
 
 test_data = readtable("datasets\dc_motor_model_identification\validation_data.csv", ...
                       "NumHeaderLines", 2);
-test_data = process_dataset(test_data);
+test_data = process_identification_dataset(test_data);
 [test_data, test_tau] = sync_reference_and_measurements(test_data);
 fprintf(logID, "Test tau = %.8g s\n", test_tau);
 
@@ -93,64 +93,6 @@ end
 fclose(logID);
 end
 %% Local functions
-function out_T = process_dataset(in_T)
-arguments
-    in_T table
-end
-
-check_table_vars(in_T.Properties.VariableNames, ["t", "m1cur", "m2cur", "m3cur", ...
-                                                 "m1vel", "m2vel", "m3vel"]);
-
-out_T = in_T;
-% Conver time from ms to s
-out_T.t = out_T.t / 1000;
-
-% Shift time by 0.03 s so that time start from 0
-out_T.t = out_T.t + 0.03;
-
-% Add start row to table. Fill this row with zeros
-start_row = zeros(1, width(out_T));
-out_T = [array2table(start_row, "VariableNames", out_T.Properties.VariableNames); out_T];
-
-% Add sign to current values. Sign taken from motor/wheel velocity
-for m = 1:3
-    mstr = "m" + num2str(m);
-    out_T.(mstr + "cur") = sign(out_T.(mstr + "vel")) .* out_T.(mstr + "cur");
-end
-end
-
-function [out_T, tau] = sync_reference_and_measurements(in_T, options)
-arguments
-    in_T table,
-    options.DeadZone = 3
-end
-
-check_table_vars(in_T.Properties.VariableNames, ["t", "m1setvel", "m2setvel", "m3setvel", ...
-                                                 "m1vel", "m2vel", "m3vel"]);
-
-out_T = in_T;
-% Find indexes of reference step changing
-ref_step_idx = find(diff(abs(out_T.m1setvel) < options.DeadZone));
-% Find indexes of velocity step changing
-vel_step_idx = find(diff(abs(out_T.m1vel) < options.DeadZone));
-
-assert(length(ref_step_idx) == length(vel_step_idx), ...
-       "ref_step_idx and vel_step_idx have the same length.");
-assert(rem(length(ref_step_idx), 2) == 0, "ref_step_idx and vel_step_idx must have even length.");
-
-for i = 1:length(ref_step_idx)/2
-    rise_gap_idx = ref_step_idx(2*i-1):vel_step_idx(2*i-1);
-    fall_gap_idx = ref_step_idx(2*i):vel_step_idx(2*i);
-    for m = 1:3
-        setvelstr = "m" + num2str(m) + "setvel";
-        out_T.(setvelstr)(rise_gap_idx) = 0;
-        out_T.(setvelstr)(fall_gap_idx) = out_T.(setvelstr)(fall_gap_idx(1)-1);
-    end
-end
-
-tau = mean(out_T.t(vel_step_idx) - out_T.t(ref_step_idx));
-end
-
 function p = specify_estimated_parameters(mdl)
 arguments
     mdl {mustBeTextScalar}
