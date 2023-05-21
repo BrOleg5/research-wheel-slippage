@@ -2,7 +2,7 @@ function plot_wheel_slippage_vs_current_graphs()
 % PLOT_WHEEL_SLIPPAGE_VS_AXIS_CURRENT_GRAPHS  Entry point
 
 lang = "ru";
-export_graph = false;
+export_graph = true;
 set(groot, "defaultAxesFontName", "Arial");
 input_dataset_file = "output_files/datasets/for_research_movement_direction/one_surface_type/averaged_data.csv";
 output_dir = "output_files/graphs/for_research_movement_direction";
@@ -264,6 +264,114 @@ for st = surftype.'
                           'BackgroundColor', 'white', 'Colorspace', 'rgb');
             close(fig);
         end
+    end
+end
+end
+
+function plot_lin_wheel_slippage_vs_prod_cur_and_vel(T, options)
+arguments
+    T table,
+    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false
+    options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
+        mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
+        "eps", "emf", "pdf"])} = ["emf", "pdf"]
+    options.ExportGraphFolder {mustBeText, mustBeNonempty},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
+end
+
+check_table_vars(T.Properties.VariableNames, ["surftype", "movedir", "m1cur", "m2cur", ...
+                                              "m3cur", "m1vel", "m2vel", "m3vel", ...
+                                              "w1linslip", "w2linslip", "w3linslip"]);
+
+movedir = unique(T.movedir);
+surftype = unique(T.surftype);
+for st = surftype.'
+    idx = T.surftype == st;
+    sample_T = T(idx, :);
+    surf_str = string(st);
+    for m = 1:3
+        mot_str = strcat("m", num2str(m));
+        wh_str = strcat("w", num2str(m));
+        productCurrentAndVelocity = sample_T.(strcat(mot_str, "cur")) .* sample_T.(strcat(mot_str, "vel"));
+        fig = figure("Name", strcat(surf_str, " motor ", num2str(m)), 'WindowState', 'maximized');
+        grid on;
+        hold on;
+        n = length(movedir);
+        colors = generate_distrinct_colors(n);
+        slip = sample_T.(strcat(wh_str, "linslip"));
+        for j = 1:n
+            idx = sample_T.movedir == movedir(j);
+            plot(productCurrentAndVelocity(idx), slip(idx), "LineStyle", "none", "Marker", ".", ...
+                 "MarkerSize", 10, "MarkerEdgeColor", colors(j, :));
+        end
+        xlabel_dict = containers.Map(["en", "ru"], ["Current \times velocity, A \times rad/s", ...
+                                                    "Ток \times скорость, А \times рад/с"]);
+        ylabel_dict = containers.Map(["en", "ru"], ["Slippage", "Проскальзывание"]);
+        xlabel_translate(xlabel_dict, options.Language, 'Interpreter', 'tex');
+        ylabel_translate(ylabel_dict, options.Language);
+        lgd = legend(string(movedir), 'Location', 'bestoutside', 'NumColumns', 2, 'FontSize', 12);
+        legend_title_dict = containers.Map(["en", "ru"], ["Movement direction, \circ", ...
+                                                          "Направление движения, \circ"]);
+        title(lgd, legend_title_dict(options.Language), 'Interpreter', 'tex');
+        ax = gca;
+        ax.XLim(1) = 0;
+        ax.YLim(1) = 0;
+        ax.FontSize = 14;
+        if(options.ExportGraphs)
+            output_dir = fullfile(options.ExportGraphFolder, "lin_wheel_slippage_vs_prod_cur_and_vel", ...
+                                  "separate_graphs");
+            output_dir = fullfile(output_dir, surf_str);
+            if(~isfolder(output_dir))
+                mkdir(output_dir);
+            end
+            file_name = fullfile(output_dir, strcat("motor", num2str(m)));
+            export_graphs(fig, file_name, options.ExportGraphExtensions, 'ContentType', 'vector', ...
+                          'BackgroundColor', 'white', 'Colorspace', 'rgb');
+            close(fig);
+        end
+    end
+end
+
+surface_color_dict = get_surface_color_dict();
+for m = 1:3
+    fig = figure("Name", strcat("Motor ", num2str(m)));
+    grid on;
+    hold on;
+    for i = 1:length(surftype)
+        idx = T.surftype == surftype(i);
+        sample_T = T(idx, :);
+
+        mot_str = strcat("m", num2str(m));
+        wh_str = strcat("w", num2str(m));
+        productCurrentAndVelocity = sample_T.(strcat(mot_str, "cur")) .* sample_T.(strcat(mot_str, "vel"));
+        slip = sample_T.(strcat(wh_str, "linslip"));
+        surf_str = string(surftype(i));
+        plot(productCurrentAndVelocity, slip, "LineStyle", "none", "Marker", ".", "MarkerSize", 5, ...
+             "MarkerEdgeColor", surface_color_dict(surf_str));
+    end
+    xlabel_dict = containers.Map(["en", "ru"], ["Current \times velocity, A \times rad/s", ...
+                                                "Ток \times скорость, А \times рад/с"]);
+    ylabel_dict = containers.Map(["en", "ru"], ["Slippage", "Проскальзывание"]);
+    xlabel_translate(xlabel_dict, options.Language, 'Interpreter', 'tex');
+    ylabel_translate(ylabel_dict, options.Language);
+    surf_str = string(surftype);
+    legend_dict = containers.Map(["en", "ru"], {surf_str, translate_surface(surf_str)});
+    lgd = legend_translate(legend_dict, options.Language, 'Location', 'best');
+    legend_title_dict = containers.Map(["en", "ru"], ["Surface type", "Тип поверхности"]);
+    title(lgd, legend_title_dict(options.Language));
+    ax = gca;
+    ax.XLim(1) = 0;
+    ax.YLim = [0, 1];
+    if(options.ExportGraphs)
+        output_dir = fullfile(options.ExportGraphFolder, "lin_wheel_slippage_vs_prod_cur_and_vel", ...
+                              "common_graphs");
+        if(~isfolder(output_dir))
+            mkdir(output_dir);
+        end
+        file_name = fullfile(output_dir, strcat("motor", num2str(m)));
+        export_graphs(fig, file_name, options.ExportGraphExtensions, 'ContentType', 'vector', ...
+                      'BackgroundColor', 'white', 'Colorspace', 'rgb');
+        close(fig);
     end
 end
 end

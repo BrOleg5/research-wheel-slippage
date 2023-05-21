@@ -1,3 +1,4 @@
+%% TODO: split this into local functions
 function process_one_surface_type_dataset(input_dataset_file, options)
 % PROCESS_ONE_SURFACE_TYPE_DATASET Entry point
 
