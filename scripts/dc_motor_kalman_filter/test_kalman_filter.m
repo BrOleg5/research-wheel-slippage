@@ -1,6 +1,6 @@
 function test_kalman_filter()
 
-export_graph = false;
+export_graph = true;
 export_graph_folder = "output_files/graphs/dc_motor_kalman_filter";
 export_graph_extensions = ["emf", "pdf"];
 
