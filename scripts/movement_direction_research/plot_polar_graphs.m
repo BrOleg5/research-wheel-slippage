@@ -79,7 +79,7 @@ for m = ["1", "2", "3"]
         surf_str = string(st);
         mot_str = strcat("m", m, "cur");
         polarplot(deg2rad(sample_T.movedir), sample_T.(mot_str), 'LineStyle', 'none', ...
-                  'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', surface_color_dict(surf_str));
+                  'Marker', '.', 'MarkerSize', 10, 'MarkerEdgeColor', surface_color_dict(surf_str));
         hold on;
         grid on;
     end
@@ -294,7 +294,7 @@ for m = ["1", "2", "3"]
         mean_current = [mean_current; mean_current(1)];
         surf_str = string(surftype(i));
         polarplot(deg2rad(move_dir), mean_current, 'LineStyle', '-', 'Color', surface_color_dict(surf_str), ...
-                  'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', surface_color_dict(surf_str));
+                  'Marker', '.', 'MarkerSize', 10, 'MarkerEdgeColor', surface_color_dict(surf_str));
         hold on;
     end
     if(isMATLABReleaseOlderThan("R2022a"))

@@ -171,7 +171,7 @@ for m = 1:3
             slip = sample_T.(strcat(wh_str, "slip"));
         end
         surf_str = string(surftype(i));
-        plot(cur, slip, "LineStyle", "none", "Marker", ".", "MarkerSize", 5, ...
+        plot(cur, slip, "LineStyle", "none", "Marker", ".", "MarkerSize", 10, ...
              "MarkerEdgeColor", surface_color_dict(surf_str));
     end
     xlabel_dict = containers.Map(["en", "ru"], ["Current, A", "Ток, А"]);
@@ -186,6 +186,7 @@ for m = 1:3
     ax = gca;
     ax.XLim = [0, 1.6];
     ax.YLim = [0, 1];
+    ax.FontSize = 12;
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "wheel_slippage_vs_motor_current", ...
                               "common_graphs");

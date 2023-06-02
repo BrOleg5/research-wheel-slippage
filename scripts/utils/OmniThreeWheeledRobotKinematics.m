@@ -1,5 +1,5 @@
 classdef OmniThreeWheeledRobotKinematics
-    % ROBOTKINEMATICS Represent kinematics of omnidirectional three-wheeled robot.
+    % OMNITHREEWHEELEDROBOTKINEMATICS Represent kinematics of omnidirectional three-wheeled robot.
     % E.g. Festo Robotino
     
     properties

@@ -162,8 +162,9 @@ for m = 1:3
     legend_dict = containers.Map(["en", "ru"], {en_legends, ru_legends});
     legend_translate(legend_dict, options.Language, 'Location', 'best');
     ax = gca;
-    ax.XLim(1) = 0;
-    ax.YLim(1) = 0;
+    ax.XLim = [0, 1.6];
+    ax.YLim = [0, 6];
+    ax.FontSize = 12;
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "wheel_delta_velocity_vs_motor_current", ...
                               "speed_amplitude_influence");
@@ -240,6 +241,7 @@ for m = 1:3
     ax = gca;
     ax.XLim(1) = 0;
     ax.YLim(1) = 0;
+    ax.FontSize = 12;
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, "wheel_slippage_vs_motor_current", ...
                               "speed_amplitude_influence");
