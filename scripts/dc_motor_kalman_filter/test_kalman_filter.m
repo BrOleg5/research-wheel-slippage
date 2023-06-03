@@ -1,22 +1,50 @@
-function test_kalman_filter()
+function test_kalman_filter(options)
 
-export_graph = true;
-export_graph_folder = "output_files/graphs/dc_motor_kalman_filter";
-export_graph_extensions = ["emf", "pdf"];
+arguments
+    options.ExportGraphs (1, 1) logical = true,
+    options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
+        mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
+        "eps", "emf", "pdf"])} = ["emf", "pdf"],
+    options.ExportGraphFolder {mustBeText, mustBeNonempty} = "output_files/graphs/dc_motor_kalman_filter",
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "ru",
+    options.ModelPath {mustBeText, mustBeNonempty} = "output_files/model_parameters/motor_models.mat",
+end
 
-motor_models_path = "output_files/model_parameters/motor_models.mat";
-load(motor_models_path, "motor_model");
+load(options.ModelPath, "motor_model");
 
-% Load dataset
-dataset = readtable("datasets\dc_motor_model_identification\data_for_identification_without_integral.csv", ...
-                       "NumHeaderLines", 2);
-% dataset = readtable("datasets\dc_motor_model_identification\validation_data.csv", ...
-%                        "NumHeaderLines", 2);
-% dataset = readtable("datasets\dc_motor_model_identification\green_gray_validation_data.csv", ...
-%                        "NumHeaderLines", 2);
-% dataset = readtable("datasets\dc_motor_model_identification\table_green_validation_data.csv", ...
-%                        "NumHeaderLines", 2);
-dataset = process_identification_dataset(dataset);
+% Datasets
+dataset_path = "datasets\dc_motor_model_identification";
+dataset_file = ["data_for_identification_without_integral.csv", "validation_data.csv", ...
+    "green_gray_validation_data.csv", "table_green_validation_data.csv"];
+dataset_name = ["train_data", "validation_data", "green_gray_validation_data", ...
+    "table_green_validation_data"];
+dataset_path = fullfile(dataset_path, dataset_file);
+
+for i = 1:length(dataset_path)
+    % Load dataset
+    dataset = readtable(dataset_path(i), "NumHeaderLines", 2);
+    dataset = process_identification_dataset(dataset);
+    impl_test_kalman_filter(dataset, motor_model, 'ExportGraphs', options.ExportGraphs, ...
+        'ExportGraphExtensions', options.ExportGraphExtensions, ...
+        'ExportGraphFolder', options.ExportGraphFolder, 'Language', options.Language, ...
+        'ExportFileName', dataset_name(i));
+end
+end
+%% Local functions
+function impl_test_kalman_filter(dataset, motor_model, options)
+
+arguments
+    dataset table,
+    motor_model struct,
+    options.ExportGraphs (1, 1) logical = false,
+    options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
+        mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
+        "eps", "emf", "pdf"])} = ["emf", "pdf"],
+    options.ExportGraphFolder {mustBeText, mustBeNonempty} = ...
+    "output_files/graphs/dc_motor_kalman_filter",
+    options.ExportFileName {mustBeTextScalar},
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "ru",
+end
 
 P = [3^2,      0,       0;
        0,  300^2,       0;
@@ -34,21 +62,28 @@ for motor_num = 1:3
     ci = calc_confidence_interval(x_hat_history, P_history);
     ci = [squeeze(ci(:, 1, :)), squeeze(ci(:, 2, end:-1:1))];
 
-    fig = plot_compare(x_hat_history, P_history, motor_data, ci);
+    [state_fig, uncertancy_fig] = plot_compare(x_hat_history, P_history, motor_data, ci);
 
-    if(export_graph)
-        output_dir = fullfile(export_graph_folder, "motor" + num2str(motor_num));
+    if(options.ExportGraphs)
+        output_dir = fullfile(options.ExportGraphFolder, "motor" + num2str(motor_num));
         if(~isfolder(output_dir))
             mkdir(output_dir);
         end
-        file_name = fullfile(output_dir, "train_data");
-        export_graphs(fig, file_name, export_graph_extensions, 'ContentType', 'vector', ...
+        file_name = fullfile(output_dir, options.ExportFileName);
+        export_graphs(state_fig, file_name, options.ExportGraphExtensions, 'ContentType', 'vector', ...
                       'BackgroundColor', 'white', 'Colorspace', 'rgb');
-        close(fig);
+        close(state_fig);
+
+        if(motor_num == 1)
+            file_name = fullfile(output_dir, "uncertancy");
+            export_graphs(uncertancy_fig, file_name, options.ExportGraphExtensions, ...
+                'ContentType', 'vector', 'BackgroundColor', 'white', 'Colorspace', 'rgb');
+        end
+        close(uncertancy_fig);
     end
 end
 end
-%% Local functions
+
 function [x_hat_history, P_history] = simulate(x_hat, P, dataset, model, options)
 arguments
     x_hat (3, 1) {mustBeNumeric, mustBeReal},
@@ -75,7 +110,7 @@ for i = 1:height(dataset)
 end
 end
 
-function fig = plot_compare(x_hat_history, P_history, dataset, ci)
+function [state_fig, uncertancy_fig] = plot_compare(x_hat_history, P_history, dataset, ci)
 arguments
     x_hat_history (3, 1, :) {mustBeNumeric, mustBeReal},
     P_history (3, 3, :) {mustBeNumeric, mustBeReal},
@@ -87,36 +122,49 @@ n_x = size(x_hat_history, 1);
 
 check_table_vars(dataset.Properties.VariableNames, ["t", "setvel", "cur", "vel"]);
 
-fig = figure("Name", "Kalman filter", "WindowState", "maximized");
+state_fig = figure("Name", "Kalman filter", "WindowState", "maximized");
 y_name = ["Ток, А", "Скорость, рад/с", "Момент, Нм"];
 t_name = ["cur", "vel"];
-uns_name = ["Неопределённость тока", "Неопределённость скорости", "Неопределённость момента"];
-tiledlayout(n_x, 2, "TileSpacing", "tight", "Padding", "compact");
+tiledlayout(n_x, 1, "TileSpacing", "tight", "Padding", "compact");
 for i = 1:n_x
     nexttile;
-    fill([dataset.t; dataset.t(end:-1:1)], ci(i, :), "green", "FaceAlpha", 0.2, "EdgeColor", "none");
     grid on;
     hold on;
+    fill([dataset.t; dataset.t(end:-1:1)], ci(i, :), "green", "FaceAlpha", 0.4, "EdgeColor", "none");
     if(i ~= 3)
-        plot(dataset.t, dataset.(t_name(i)), 'Color', 'blue', 'LineWidth', 0.75);
+        plot(dataset.t, dataset.(t_name(i)), 'Color', 'blue', 'LineWidth', 1);
     end
-    plot(dataset.t, squeeze(x_hat_history(i, :, :)), 'Color', 'red', 'LineWidth', 0.75);
+    plot(dataset.t, squeeze(x_hat_history(i, :, :)), 'Color', 'red', 'LineWidth', 1);
     xlabel("Время, с");
     ylabel(y_name(i));
-    if(i == 2)
-        legend(["Доверительный интервал 95%", "Измерения", "Отфильтрованное"], ...
-            "Location", "best", "FontSize", 11);
+    switch i
+        case {1, 2}
+            legend(["Доверительный интервал 95%", "Измерения", "Отфильтрованное"], ...
+                "Location", "best");
+        case 3
+            legend(["Доверительный интервал 95%", "Оценка"], ...
+                "Location", "best");
     end
     ax = gca;
-    ax.FontSize = 11;
+    ax.FontSize = 13;
+    ax.XLimitMethod = 'tight';
+    ax.YLimitMethod = 'tickaligned';
+end
+
+uncertancy_fig = figure("Name", "Kalman filter uncertancy", "WindowState", "maximized");
+uns_name = ["Неопределённость тока", "Неопределённость скорости", "Неопределённость момента"];
+tiledlayout(n_x, 1, "TileSpacing", "tight", "Padding", "compact");
+for i = 1:n_x
     nexttile;
-    plot(dataset.t, squeeze(P_history(i, i, :)), 'Color', 'black', 'LineWidth', 0.75);
     grid on;
     hold on;
+    plot(dataset.t, squeeze(P_history(i, i, :)), 'Color', 'black', 'LineWidth', 2);
     xlabel("Время, с");
     ylabel(uns_name(i));
     ax = gca;
-    ax.FontSize = 11;
+    ax.FontSize = 13;
+    ax.XLimitMethod = 'tight';
+    ax.YLimitMethod = 'padded';
 end
 end
 
