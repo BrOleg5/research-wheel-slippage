@@ -1,18 +1,39 @@
-%% Configuration
+function determine_surftype(top_view_image_path, input_dataset_folder)
+
+arguments
+    top_view_image_path {mustBeText, mustBeFile},
+    input_dataset_folder {mustBeTextScalar, mustBeFolder}
+end
+
 surfType = categorical(["table", "green", "gray"]);
-[robotParameters, robotKinematics] = get_robot_parameters();
-%% Read camera parameters
+
+frame = imread(top_view_image_path);
+catMap = findSurfaceBorder(frame, surfType);
+
+list_of_files = dir(input_dataset_folder + "/exp*.csv");
+for j = 1:length(list_of_files)
+    input_dataset_file = fullfile(list_of_files(j).folder, list_of_files(j).name);
+    write_surftype(catMap, input_dataset_file);
+end
+end
+%% Local functions
+function write_surftype(catMap, input_dataset_file)
+arguments
+    catMap categorical,
+    input_dataset_file {mustBeTextScalar, mustBeFile}
+end
+
+surfType = categorical(["table", "green", "gray"]);
+
+[robotParameters, ~] = get_robot_parameters();
+
 fid = fopen("config\camera_params.json");
 raw = fread(fid, inf);
 fclose(fid);
 camera_param = jsondecode(char(raw'));
 cameraParameters = struct('x', camera_param.pixel_resolution_x/1e3, ...
                           'y', camera_param.pixel_resolution_y/1e3);
-%% Find surfaces border
-frame = imread("datasets/for_research_movement_direction/two_surface_types/green_table/top_view.jpg");
-catMap = findSurfaceBorder(frame, surfType);
-%% Main
-input_dataset_file = "output_files/datasets/for_research_movement_direction/two_surface_types/green_table/exp02.csv";
+
 T = readtable(input_dataset_file, "NumHeaderLines", 2);
 
 % Read headlines of file
@@ -44,14 +65,8 @@ fclose(fid);
 % Write table in file
 writetable(T, input_dataset_file, 'Delimiter', ';', 'WriteMode', 'Append', ...
            'WriteVariableNames', true);
-%% Clear
-clear T X Y alpha ans beta catMap circlePixel circleSurfType column_description ...
-      column_units csvFile csvIdx currentSurfType ext fid fileNames frame frameHeight frameWidth ...
-      heightCamera i idx imageColumn imageRow inEllipse intersect j listOfFiles movementType name ...
-      outMap outputCsv pixelSize prevSurfType processed_data raw repeatedObservation robotParameters ...
-      slope splitImageByLine startObservations surfType vidObj videoFile videoIdx file_path k ...
-      wheel_coord averaging imageFile imageIdx listOfFiles;
-%% Local functions
+end
+
 function catMap = findSurfaceBorder(frame, surface_type)
 arguments
     frame (:, :, 3) {mustBeNonempty},
@@ -118,15 +133,11 @@ end
     [imageColumn, imageRow] = meshgrid(1:frameWidth, 1:frameHeight);
     splitImageByLine = @(X, Y, slope, intersect) X > ((Y - intersect) ./ slope);
     outMap = splitImageByLine(imageColumn, imageRow, slope, intersect);
-    stats = regionprops(~outMap, "Centroid");
     string_surface = string(surface_type);
-    ddPosition = [app.ax.Position(1) + stats.Centroid(1)*0.7, app.ax.Position(2) + stats.Centroid(2)*0.7, ...
-                  110, 30];
+    ddPosition = [50, 400, 110, 30];
     app.surfaseDropDown(1) = uidropdown(app.fig, "Items", string_surface, "Value", string_surface(1), ...
                                         "Position", ddPosition);
-    stats = regionprops(outMap, "Centroid");
-    ddPosition = [app.ax.Position(1) + stats.Centroid(1)*0.7, app.ax.Position(2) + stats.Centroid(2)*0.7, ...
-                  110, 30];
+    ddPosition = [1000, 400, 110, 30];
     app.surfaseDropDown(2) = uidropdown(app.fig, "Items", string_surface, "Value", string_surface(1), ...
                                         "Position", ddPosition);
 
