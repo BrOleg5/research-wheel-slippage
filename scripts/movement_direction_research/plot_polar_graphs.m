@@ -282,6 +282,42 @@ for st = surftype.'
     end
 end
 
+motor_color = ["black", "blue", "red"];
+for st = surftype.'
+    idx = T.surftype == st;
+    sample_T = T(idx, :);
+    surf_str = string(st);
+    fig = figure('Name', surf_str);
+    for m = 1:3
+        mot_str = strcat("m", num2str(m), "cur");
+        mean_current = group_mean(sample_T.(mot_str), sample_T.movedir, movement_direction);
+        move_dir = [movement_direction; movement_direction(1)];
+        mean_current = [mean_current; mean_current(1)];
+        polarplot(deg2rad(move_dir), mean_current, 'LineStyle', '-', 'Color', motor_color(m), ...
+                  'Marker', '.', 'MarkerSize', 5, 'MarkerEdgeColor', 'black');
+        hold on;
+        if(isMATLABReleaseOlderThan("R2022a"))
+            % Add degree symbol to axis ticks
+            pax = gca;
+            pax.ThetaTickLabel = string(pax.ThetaTickLabel) + char(176);
+        end
+    end
+    lgd = legend(string(1:3), 'Location', 'best');
+    legend_title_dict = containers.Map(["en", "ru"], ["Motor", "Двигатель"]);
+    title(lgd, legend_title_dict(options.Language));
+    if(options.ExportGraphs)
+        output_dir = fullfile(options.ExportGraphFolder, "polar_current", "full_averaging");
+        if(~isfolder(output_dir))
+            mkdir(output_dir);
+        end
+        file_name = fullfile(output_dir, surf_str);
+        export_graphs(fig, file_name, options.ExportGraphExtensions, 'ContentType', 'vector', ...
+                      'BackgroundColor', 'white', 'Colorspace', 'rgb');
+        saveas(fig, file_name + ".fig");
+        close(fig);
+    end
+end
+
 surface_color_dict = get_surface_color_dict();
 for m = ["1", "2", "3"]
     fig = figure('Name', strcat("motor ", m));

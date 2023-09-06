@@ -1,5 +1,7 @@
 # Research the wheel slippage of a mobile robot on a heterogeneous terrain
 
+Continuation of the project [Slippage-compensation](https://github.com/BrOleg5/Slippage-compensation).
+
 ## Requirements
 
 - Matlab R2022b

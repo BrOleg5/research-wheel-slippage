@@ -1,6 +1,6 @@
 function discrete_time_system_model(options)
 arguments
-    options.Ts (1, 1) {mustBeNumeric, mustBeReal} = 30e-3; % s
+    options.Ts (1, 1) {mustBeNumeric, mustBeReal} = 30e-3 % s
 end
 
 model_parameters_path = "output_files/model_parameters";
