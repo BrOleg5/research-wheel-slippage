@@ -1,6 +1,6 @@
 # Research the wheel slippage of a mobile robot on a heterogeneous terrain
 
-Continuation of the project [Slippage-compensation](https://github.com/BrOleg5/Slippage-compensation).
+This project is continuation of [Slippage-compensation](https://github.com/BrOleg5/Slippage-compensation).
 
 ## Requirements
 
@@ -9,5 +9,5 @@ Continuation of the project [Slippage-compensation](https://github.com/BrOleg5/S
 
 Optional:
 
-- Make 4.3 (on Windows I'm use `make` from [`choco`](https://community.chocolatey.org/packages/make#individual))
+- Make 4.3 (I use `make` from [`choco`](https://community.chocolatey.org/packages/make#individual) on Windows)
 - [legendflex-pkg](https://github.com/kakearney/legendflex-pkg/tree/master)
