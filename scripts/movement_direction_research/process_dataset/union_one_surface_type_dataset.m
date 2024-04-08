@@ -4,15 +4,11 @@ function union_one_surface_type_dataset(input_dataset_folder, output_dataset_fil
 arguments
     input_dataset_folder {mustBeTextScalar, mustBeNonzeroLengthText} = "datasets/for_research_movement_direction/one_surface_type",
     output_dataset_file {mustBeTextScalar, mustBeNonzeroLengthText} = "output_files/datasets/for_research_movement_direction/one_surface_type/no_averaged_data.csv",
-    surf_type {mustBeText, mustBeNonempty, mustBeNonzeroLengthText} = ["table", "gray", "green"]
+    surf_type {mustBeText, mustBeNonempty, mustBeNonzeroLengthText} = ["table", "gray", "green", "brown"]
 end
 
 suffix = "_surface";
 input_dirs = fullfile(input_dataset_folder, strcat(surf_type, suffix));
-
-movement_direction = 0:5:355; % degree
-speed_amplitude = 0.1:0.1:0.3; % m/s
-one_speed_nums = length(movement_direction);
 
 output_table = table;
 exp_num = 0;
@@ -27,11 +23,6 @@ for i = 1:length(input_dirs)
     idx = sort_filenames_by_number({list_of_files.name});
     list_of_files = list_of_files(idx);
     n = length(list_of_files);
-    file_nums = 0:n-1;
-    idx = mod(file_nums, one_speed_nums) + 1;
-    md = movement_direction(idx);
-    idx = idivide(int32(file_nums), int32(one_speed_nums)) + 1;
-    sp_amp = speed_amplitude(idx);
     for j = 1:n
         file_path = fullfile(list_of_files(j).folder, list_of_files(j).name);
         T = readtable(file_path, "VariableDescriptionsLine", 1, "VariableUnitsLine", 2, ...
@@ -51,8 +42,8 @@ for i = 1:length(input_dirs)
         assert(all(T.t >= 0), "Time must be positive");
 
         h = size(T, 1);
-        movedir = repelem(md(j), h, 1);
-        speedamp = repelem(sp_amp(j), h, 1);
+        movedir = round(rad2deg(wrapTo2Pi(atan2(T.ysetspeed, T.xsetspeed))));
+        speedamp = round(sqrt(T.xsetspeed.^2 + T.ysetspeed.^2), 1);
         surftype = repelem(surf_type(i), h, 1);
         expnum = repelem(exp_num, h, 1);
         T = addvars(T, expnum, 'After', 't');
