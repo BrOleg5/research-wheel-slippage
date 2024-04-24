@@ -1,13 +1,11 @@
-function compare_effective_wheel_velocity_estimations(options)
-%TEST_SYSTEM_3 Summary of this function goes here
-
+function plot_sae_vs_k(options)
 arguments
-    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = true,
+    options.ExportGraphs (1, 1) {mustBeNumericOrLogical} = false,
     options.ExportGraphExtensions {mustBeText, mustBeNonzeroLengthText, mustBeNonempty, ...
         mustBeMember(options.ExportGraphExtensions, ["jpg", "jpeg", "png", "tif", "tiff", "gif", ...
         "eps", "emf", "pdf"])} = ["emf", "pdf"]
     options.ExportGraphFolder {mustBeText, mustBeNonempty} = "output_files/graphs/test_system",
-    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "ru"
+    options.Language {mustBeTextScalar, mustBeMember(options.Language, ["en", "ru"])} = "en"
 end
 
 input_dataset_file = ...
@@ -35,50 +33,126 @@ avrT = process_test_dataset(avrT);
 
 xlabel_dict = containers.Map(["en", "ru"], ["Time, s", "Время, с"]);
 ylabel_dict = containers.Map(["en", "ru"], ["Velocity, rad/s", "Угловая скорсть, рад/с"]);
-legend_dict = containers.Map(["en", "ru"], {["encoder", "slip", "kalman + slip", "camera"], ...
-            ["энкодер", "проскальзывание", "калман + проскальзывание", "камера"]});
-title_dict = containers.Map(["en", "ru"], {["Wheel 1", "Wheel 2", "Wheel 3"], ["Колесо 1", "Колесо 2", "Колесо 3"]});
-plt_title = title_dict(options.Language);
+legend_dict = containers.Map(["en", "ru"], {["slippage model", "camera"], ...
+    ["модель проскальзывания", "камера"]});
+
+speedamp = 0.1;
+idx = T.speedamp == speedamp;
+T = T(idx, :);
+idx = avrT.speedamp == speedamp;
+avrT = avrT(idx, :);
 
 unique_expnum = unique(T.expnum, "sorted");
-for expnum = [0, 6, 9, 18, 30, 72, 78, 81, 90, 102, 144, 150, 162, 174, 216, 222, 234, 246, 288, 294, ...
-        297, 306, 318, 360, 366, 369, 378, 390, 432, 438, 441, 450, 462]
+n = length(unique_expnum);
+
+varTypes = repelem("double", 1, 12);
+result = table('Size', [n, 12], 'VariableTypes', varTypes, ...
+    'VariableNames', ["k1", "k2", "k3", "w1slip", "w2slip", "w3slip", "w1linslip", "w2linslip", ...
+    "w3linslip", "mse1", "mse2", "mse3"]);
+[~, robotKinematics] = get_robot_parameters();
+for i = 1:n
+    expnum = unique_expnum(i);
     idx = T.expnum == expnum;
     subT = T(idx, :);
 
     idx = avrT.expnum == expnum;
     subavrT = avrT(idx, :);
 
-    [w1vel, w2vel, w3vel] = slip_models(subT);
-    slip_model = struct("w1vel", w1vel, "w2vel", w2vel, "w3vel", w3vel);
     [w1vel, w2vel, w3vel, ~, ~] = kalman_f(subT);
     kalman = struct("w1vel", w1vel, "w2vel", w2vel, "w3vel", w3vel);
 
-    subT.t = subT.t / 1e3;
+    % Interpolate and extrapolate wheel effective velocity in averaged dataset
+%     interp_vel = struct("w1vel", zeros(size(w1vel)), "w2vel", zeros(size(w2vel)), ...
+%         "w3vel", zeros(size(w3vel)));
+%     for w = 1:3
+%         wstr = "w" + num2str(w) + "vel";
+%         weffstr = "w" + num2str(w) + "effvel";
+%         interp_vel.(wstr) = interp1(subavrT.t.*1e3, subavrT.(weffstr), subT.t, "linear", "extrap");
+%     end
+% 
+%     result.mse1(i) = mean((kalman.w1vel - interp_vel.w1vel).^2);
+%     result.mse2(i) = mean((kalman.w2vel - interp_vel.w2vel).^2);
+%     result.mse3(i) = mean((kalman.w3vel - interp_vel.w3vel).^2);
 
-    fig = figure("Name", "Test exp " + num2str(expnum), "WindowState", "maximized");
+    result.mse1(i) = mean((kalman.w1vel - subT.w1effvel).^2);
+    result.mse2(i) = mean((kalman.w2vel - subT.w2effvel).^2);
+    result.mse3(i) = mean((kalman.w3vel - subT.w3effvel).^2);
+    
+    assert(all(~diff(subT.movedir)), "All movement direction must be equal in one experiment");
+    assert(all(~diff(subavrT.movedir)), "All movement direction must be equal in one experiment");
+    assert(subT.movedir(1) == subavrT.movedir(1), "Movement direction in subT and subavrT must be equal");
+    K = calc_linearization_coefficient(deg2rad(subT.movedir(1)), robotKinematics);
+    
+    result.k1(i) = K(1);
+    result.k2(i) = K(2);
+    result.k3(i) = K(3);
+
+    result.w1slip(i) = mean(subT.w1slip);
+    result.w2slip(i) = mean(subT.w2slip);
+    result.w3slip(i) = mean(subT.w3slip);
+
+    result.w1linslip(i) = mean(subT.w1linslip);
+    result.w2linslip(i) = mean(subT.w2linslip);
+    result.w3linslip(i) = mean(subT.w3linslip);
+end
+
+
+for m = 1:3
+    fig = figure("Name", "Test " + num2str(m), "WindowState", "maximized");
     tiledlayout(3, 1, "TileSpacing", "tight", "Padding", "compact");
-    for m = 1:3
-        nexttile;
-        hold on;
-        grid on;
-        wstr = "w" + num2str(m);
-        plot(subT.t, subT.(wstr + "vel"), "Color", "black", "LineWidth", 2);
-        plot(subT.t, slip_model.(wstr + "vel"), "Color", "#4DBEEE", "LineWidth", 2);
-        plot(subT.t, kalman.(wstr + "vel"), "Color", "blue", "LineWidth", 2);
-        plot(subavrT.t, subavrT.(wstr + "effvel"), "Color", "red", "LineWidth", 2);
+    nexttile;
+    hold on;
+    grid on;
+    msestrstr = "mse" + num2str(m);
+    kstr = "k" + num2str(m);
+    plot(result.(kstr), result.(msestrstr), "LineStyle", "none", "Marker", ".", "MarkerSize", 8, ...
+        "MarkerEdgeColor", "black");
 
-        xlabel_translate(xlabel_dict, options.Language);
-        ylabel_translate(ylabel_dict, options.Language);
-        if(m == 2)
-            legend_translate(legend_dict, options.Language, 'Location', 'best');
-        end
-        
-        title(plt_title(m));
-        ax = gca;
-        ax.FontSize = 12;
-        ax.XLimitMethod = "tight";
+    xlabel_translate(xlabel_dict, options.Language);
+    ylabel_translate(ylabel_dict, options.Language);
+    if(m == 2)
+        legend_translate(legend_dict, options.Language, 'Location', 'best');
     end
+    
+    ax = gca;
+    ax.FontSize = 12;
+    ax.XLimitMethod = "tight";
+    ax.YLimitMethod = "padded";
+
+
+    nexttile;
+    hold on;
+    grid on;
+    slipstr = "w" + num2str(m) + "slip";
+    plot(result.(slipstr), result.(msestrstr), "LineStyle", "none", "Marker", ".", "MarkerSize", 8, ...
+        "MarkerEdgeColor", "black");
+
+    xlabel_translate(xlabel_dict, options.Language);
+    ylabel_translate(ylabel_dict, options.Language);
+    if(m == 2)
+        legend_translate(legend_dict, options.Language, 'Location', 'best');
+    end
+    
+    ax = gca;
+    ax.FontSize = 12;
+    ax.XLimitMethod = "tight";
+    ax.YLimitMethod = "padded";
+
+
+    nexttile;
+    hold on;
+    grid on;
+    linslipstr = "w" + num2str(m) + "linslip";
+    plot(result.(linslipstr), result.(msestrstr), "LineStyle", "none", "Marker", ".", "MarkerSize", 8, ...
+        "MarkerEdgeColor", "black");
+
+    xlabel_translate(xlabel_dict, options.Language);
+    ylabel_translate(ylabel_dict, options.Language);
+    
+    ax = gca;
+    ax.FontSize = 12;
+    ax.XLimitMethod = "tight";
+    ax.YLimitMethod = "padded";
     if(options.ExportGraphs)
         output_dir = fullfile(options.ExportGraphFolder, subT.surftype(1));
         if(~isfolder(output_dir))
